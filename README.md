@@ -1,6 +1,6 @@
 # Automate Algorand Quantum Transactions in Ubuntu
 
-A simple guide for running Algorand post-quantum (Falcon-1024) transactions on Ubuntu/WSL.
+Guide for running Algorand post-quantum (Falcon-1024) transactions on Ubuntu/WSL.
 
 Algorand supports post-quantum accounts using Falcon-1024 signatures, and `algokey pq` provides the commands for PQ key management and transaction signing. See the [official Algorand Post-Quantum Accounts documentation](https://dev.algorand.co/concepts/accounts/post-quantum/).
 
@@ -72,7 +72,7 @@ Never send the recovery phrase to anyone and never put it in GitHub.
 read -s PQ_MNEMONIC
 ```
 
-Paste the recovery phrase and press Enter.
+Paste the new quantum wallet recovery phrase and press Enter.
 
 Then:
 
@@ -103,6 +103,17 @@ nano transfer_100_pq.py
 ```
 
 Paste your **working transaction automation script** into the file.
+
+```SENDER = "YOUR_QUANTUM_ADDRESS"
+RECIPIENT = SENDER
+
+COUNT = 500
+AMOUNT_MICROALGO = 100_000
+FEE_MICROALGO = 3_000
+
+ALGOD_ADDRESS = "https://mainnet-api.algonode.cloud"
+KEYFILE = os.path.expanduser("~/pera_quantum.key")
+```
 
 Save in nano:
 
@@ -135,38 +146,11 @@ algo-transfer/
 
 ## 8. Configure the transaction script
 
-Typical configuration for 0.1 ALGO transactions:
-
-```python
-SENDER = "YOUR_QUANTUM_ADDRESS"
-RECIPIENT = SENDER
-
-COUNT = 100
-AMOUNT_MICROALGO = 100_000
-FEE_MICROALGO = 3_000
-```
-
-For **500 transactions**:
-
-```python
-COUNT = 500
-```
-
-0.1 ALGO = `100_000` microALGO.
-
 For the MainNet Algod endpoint used in this guide:
 
 ```python
 ALGOD_ADDRESS = "https://mainnet-api.algonode.cloud"
 ```
-
-If your script uses a delay:
-
-```python
-time.sleep(0.3)
-```
-
-> The 0.3-second sleep is only the configured delay. If the script waits for transaction confirmation, the actual time between submissions can be longer.
 
 ## 9. Test the script
 
@@ -207,7 +191,7 @@ Your script can record successful transaction IDs in a log such as:
 transactions_100.txt
 ```
 
-For 500 transactions, use your 500-transaction configuration and make sure the account has enough balance for the total amount plus fees.
+Make sure the account has enough balance for the total amount plus fees.
 
 ## 11. New PC quick setup
 
@@ -222,49 +206,6 @@ python transfer_100_pq.py
 ```
 
 Do not copy the old `venv` directory to a new PC. Recreate it with Section 5.
-
-## 12. Security
-
-Never commit these to GitHub:
-
-```text
-pera_quantum.key
-*.key
-25-word recovery phrase
-private keys
-```
-
-Create `.gitignore`:
-
-```bash
-nano .gitignore
-```
-
-Add:
-
-```text
-*.key
-pera_quantum.key
-venv/
-__pycache__/
-*.pyc
-```
-
-Save and check:
-
-```bash
-git status
-```
-
-## 13. Transaction cost example
-
-For 500 transactions of 0.1 ALGO each:
-
-- Transfer amount: **50 ALGO**
-- If the minimum Falcon-1024 fee is 0.003 ALGO per transaction: **1.5 ALGO fees**
-- Example total: **51.5 ALGO**
-
-Actual required balance can be higher depending on the account state and network conditions. Algorand's official documentation currently describes the Falcon-1024 minimum fee as 3,000 microALGO. See the official documentation before a large run.
 
 ## Useful commands
 
