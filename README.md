@@ -1,10 +1,14 @@
-# Algorand Quantum Transactions — New PC Setup Guide
+# Automate Algorand Quantum Transactions in Ubuntu
 
-A practical guide for recreating the Pera Quantum / Falcon-1024 transaction environment on a new Windows PC using WSL Ubuntu.
+A simple guide for running Algorand post-quantum (Falcon-1024) transactions on Ubuntu/WSL.
 
-## 1. Install Ubuntu / WSL
+Algorand supports post-quantum accounts using Falcon-1024 signatures, and `algokey pq` provides the commands for PQ key management and transaction signing. See the [official Algorand Post-Quantum Accounts documentation](https://dev.algorand.co/concepts/accounts/post-quantum/).
 
-Open PowerShell as Administrator:
+> ⚠️ **MainNet warning:** This guide sends real ALGO. Always verify the address, amount, transaction count, fee, and balance before running the script.
+
+## 1. Install WSL Ubuntu
+
+Open **PowerShell as Administrator**:
 
 ```powershell
 wsl --install -d Ubuntu
@@ -19,8 +23,6 @@ sudo apt update
 sudo apt upgrade -y
 ```
 
-Create your Linux username and password if Ubuntu asks.
-
 ## 3. Install Python
 
 ```bash
@@ -30,44 +32,25 @@ python3 --version
 
 ## 4. Install Algorand tools
 
-Install the current Algorand package using the official Algorand installation instructions.
+Install the current Algorand software using the official installation instructions. `algokey` is included with the Algorand node software, and the PQ commands include `generate`, `import`, `info`, `sign`, and `check-address`.
 
-Install Algorand tools:
+Official documentation:
 
-```bash
-sudo apt update
-sudo apt install -y gnupg2 curl software-properties-common
+- https://dev.algorand.co/reference/algokey/
+- https://dev.algorand.co/nodes/installation/manual-installation/
 
-curl -o - https://releases.algorand.com/key.pub | sudo tee /etc/apt/trusted.gpg.d/algorand.asc
-
-sudo add-apt-repository "deb [arch=amd64] https://releases.algorand.com/deb/ stable main"
-
-sudo apt update
-
-sudo apt install -y algorand-devtools
-```
-
-Verify that the PQ commands are available:
+Verify:
 
 ```bash
 algokey --version
 algokey pq --help
 ```
 
-You should have PQ commands such as `import`, `info`, and `sign`.
-
 ## 5. Create the project
-
-Create the project folder and enter it:
 
 ```bash
 mkdir -p ~/algo-transfer
 cd ~/algo-transfer
-```
-
-Create and activate the Python virtual environment:
-
-```bash
 python3 -m venv venv
 source venv/bin/activate
 ```
@@ -79,112 +62,66 @@ pip install py-algorand-sdk msgpack
 python -c "import algosdk; print('Algorand SDK OK')"
 ```
 
-## 6. Restore your Pera Quantum key
+## 6. Restore your Quantum account
 
-The safest approach is to recreate the key from your **Pera Quantum recovery phrase** rather than copying the private key file to the new PC.
+Use your **Pera Quantum 25-word recovery phrase locally** to recreate the Falcon-1024 key.
 
-Never send your recovery phrase to anyone, including ChatGPT. Never commit it to GitHub.
-
-Enter it locally:
+Never send the recovery phrase to anyone and never put it in GitHub.
 
 ```bash
 read -s PQ_MNEMONIC
 ```
 
-Paste the 25-word recovery phrase and press Enter.
+Paste the recovery phrase and press Enter.
 
-Import it:
+Then:
 
 ```bash
 algokey pq import -m "$PQ_MNEMONIC" -k ~/pera_quantum.key
-```
-
-Clear the shell variable immediately:
-
-```bash
 unset PQ_MNEMONIC
 ```
 
-Verify the key:
+Check the account:
 
 ```bash
 algokey pq info -k ~/pera_quantum.key
 ```
 
-Confirm that the displayed Falcon-1024 PQ address matches your Pera Quantum account.
+Check PQ compliance:
 
-> **Security:** Do not commit `pera_quantum.key` or your recovery phrase to this repository. Keep the recovery phrase offline and secure.
+```bash
+algokey pq check-address YOUR_QUANTUM_ADDRESS
+```
 
-## 7. Create new transaction scripts
+## 7. Create your transaction script
 
-On a new PC, you can create the Python scripts manually instead of restoring an old `venv` or expecting the scripts to appear automatically.
-
-### 7.1 Go to the project folder
+Create the Python file:
 
 ```bash
 cd ~/algo-transfer
-```
-
-### 7.2 Create the main transaction script
-
-Create a new file named `transfer_100_pq.py`:
-
-```bash
 nano transfer_100_pq.py
 ```
 
-The file will initially be empty. This is normal.
+Paste your **working transaction automation script** into the file.
 
-Now **paste your previously working 100/500 transaction Python code** into the file.
-
-For example, the file should contain your working code that:
-
-- Connects to Algorand MainNet.
-- Uses your Falcon-1024 / Pera Quantum signing setup.
-- Sets the sender and recipient.
-- Sets the transaction amount and fee.
-- Builds and signs the transactions.
-- Sends the transactions.
-- Records successful transaction IDs in `transactions_100.txt`.
-
-> **Important:** The README does not store your private key, recovery phrase, or secret signing material. Copy only the Python source code that you previously tested and verified.
-
-Save the file in `nano`:
-
-1. Press `Ctrl + O`
-2. Press `Enter`
-3. Press `Ctrl + X`
-
-Check that it was created:
-
-```bash
-ls -l transfer_100_pq.py
-```
-
-Check its contents:
-
-```bash
-nano transfer_100_pq.py
-```
-
-### 7.3 Create the helper script, if your setup uses it
-
-If your previous setup used `make_tx.py`, create it the same way:
-
-```bash
-nano make_tx.py
-```
-
-Paste your previously working `make_tx.py` code, then save:
+Save in nano:
 
 1. `Ctrl + O`
 2. `Enter`
 3. `Ctrl + X`
 
-Check both files:
+If your setup also uses `make_tx.py`:
 
 ```bash
-ls -la ~/algo-transfer
+nano make_tx.py
+```
+
+Paste your working helper script and save it.
+
+Check the files:
+
+```bash
+ls -la
 ```
 
 You should have something similar to:
@@ -196,42 +133,9 @@ algo-transfer/
 └── venv/
 ```
 
-The transaction log `transactions_100.txt` will normally be created by the transaction script after a successful run. You do not need to create an empty log file manually unless your script specifically requires one.
+## 8. Configure the transaction script
 
-### 7.4 Test the new script before running it
-
-Make sure the virtual environment is active:
-
-```bash
-cd ~/algo-transfer
-source venv/bin/activate
-```
-
-Run a Python syntax check:
-
-```bash
-python -m py_compile transfer_100_pq.py
-```
-
-If there is **no output**, the Python syntax check passed.
-
-If there is an error, open the file and correct it:
-
-```bash
-nano transfer_100_pq.py
-```
-
-Then run the syntax check again.
-
-### 7.5 Copy the script from your old PC instead
-
-If you already have the working script on your old PC, you can copy `transfer_100_pq.py` and `make_tx.py` into `~/algo-transfer` instead of manually retyping them.
-
-Do **not** copy the old `venv` directory. Recreate the virtual environment using Section 5.
-
-## 8. Check the transaction configuration
-
-Typical configuration:
+Typical configuration for 0.1 ALGO transactions:
 
 ```python
 SENDER = "YOUR_QUANTUM_ADDRESS"
@@ -242,45 +146,31 @@ AMOUNT_MICROALGO = 100_000
 FEE_MICROALGO = 3_000
 ```
 
-For 500 transactions:
+For **500 transactions**:
 
 ```python
 COUNT = 500
 ```
 
-For 0.1 ALGO:
+0.1 ALGO = `100_000` microALGO.
 
-```python
-AMOUNT_MICROALGO = 100_000
-```
-
-MainNet Algod endpoint:
+For the MainNet Algod endpoint used in this guide:
 
 ```python
 ALGOD_ADDRESS = "https://mainnet-api.algonode.cloud"
 ```
 
-If your script uses a delay between transactions:
+If your script uses a delay:
 
 ```python
 time.sleep(0.3)
 ```
 
-## 9. Verify before sending
+> The 0.3-second sleep is only the configured delay. If the script waits for transaction confirmation, the actual time between submissions can be longer.
 
-Check the restored account:
+## 9. Test the script
 
-```bash
-algokey pq info -k ~/pera_quantum.key
-```
-
-Check the account balance:
-
-```bash
-python -c "from algosdk.v2client import algod; c=algod.AlgodClient('', 'https://mainnet-api.algonode.cloud'); a='YOUR_QUANTUM_ADDRESS'; print(c.account_info(a)['amount']/1000000, 'ALGO')"
-```
-
-Check the Python script for syntax errors:
+Always run a syntax check first:
 
 ```bash
 python -m py_compile transfer_100_pq.py
@@ -288,9 +178,115 @@ python -m py_compile transfer_100_pq.py
 
 No output means the syntax check passed.
 
-## 10. Run the transaction automation
+Check your Quantum account:
 
-Activate the environment:
+```bash
+algokey pq info -k ~/pera_quantum.key
+```
+
+Before a real MainNet run, confirm:
+
+- Sender address
+- Recipient address
+- Transaction amount
+- Transaction count
+- Fee
+- Available ALGO balance
+
+## 10. Run the automation
+
+```bash
+cd ~/algo-transfer
+source venv/bin/activate
+python transfer_100_pq.py
+```
+
+Your script can record successful transaction IDs in a log such as:
+
+```text
+transactions_100.txt
+```
+
+For 500 transactions, use your 500-transaction configuration and make sure the account has enough balance for the total amount plus fees.
+
+## 11. New PC quick setup
+
+After installing WSL, Python, Algorand tools, and the project:
+
+```bash
+cd ~/algo-transfer
+source venv/bin/activate
+algokey pq info -k ~/pera_quantum.key
+python -m py_compile transfer_100_pq.py
+python transfer_100_pq.py
+```
+
+Do not copy the old `venv` directory to a new PC. Recreate it with Section 5.
+
+## 12. Security
+
+Never commit these to GitHub:
+
+```text
+pera_quantum.key
+*.key
+25-word recovery phrase
+private keys
+```
+
+Create `.gitignore`:
+
+```bash
+nano .gitignore
+```
+
+Add:
+
+```text
+*.key
+pera_quantum.key
+venv/
+__pycache__/
+*.pyc
+```
+
+Save and check:
+
+```bash
+git status
+```
+
+## 13. Transaction cost example
+
+For 500 transactions of 0.1 ALGO each:
+
+- Transfer amount: **50 ALGO**
+- If the minimum Falcon-1024 fee is 0.003 ALGO per transaction: **1.5 ALGO fees**
+- Example total: **51.5 ALGO**
+
+Actual required balance can be higher depending on the account state and network conditions. Algorand's official documentation currently describes the Falcon-1024 minimum fee as 3,000 microALGO. See the official documentation before a large run.
+
+## Useful commands
+
+Check Algorand tools:
+
+```bash
+algokey --version
+```
+
+Check Quantum key:
+
+```bash
+algokey pq info -k ~/pera_quantum.key
+```
+
+Check address:
+
+```bash
+algokey pq check-address YOUR_QUANTUM_ADDRESS
+```
+
+Activate the project:
 
 ```bash
 cd ~/algo-transfer
@@ -303,55 +299,12 @@ Run the script:
 python transfer_100_pq.py
 ```
 
-Before starting, verify the sender, recipient, amount, count, fee, and available balance.
+## Official Algorand documentation
 
-If your script uses a confirmation such as:
-
-```text
-START100
-```
-
-enter it only after checking all displayed transaction details.
-
-For 500 transactions, make sure the script's count is set to 500 and use the corresponding confirmation required by your script.
-
-## 11. Recommended backup
-
-Keep a backup of the source scripts:
-
-```text
-algo-transfer-backup/
-├── make_tx.py
-└── transfer_100_pq.py
-```
-
-Do **not** put these in the backup repository:
-
-```text
-pera_quantum.key
-25-word recovery phrase
-private keys
-```
-
-## Quick start after the new PC is configured
-
-For future sessions, the basic startup is:
-
-```bash
-cd ~/algo-transfer
-source venv/bin/activate
-python transfer_100_pq.py
-```
-
-## Security checklist
-
-- Never publish your Quantum recovery phrase.
-- Never commit `pera_quantum.key` to GitHub.
-- Add sensitive key files to `.gitignore`.
-- Verify the sender and recipient before every real MainNet run.
-- Test with a small transaction count before increasing the count.
-- Keep an offline backup of the recovery phrase.
+- [Post-Quantum Accounts](https://dev.algorand.co/concepts/accounts/post-quantum/)
+- [AlgoKey](https://dev.algorand.co/reference/algokey/)
+- [Algorand Installation](https://dev.algorand.co/nodes/installation/manual-installation/)
 
 ## Repository
 
-This guide is maintained in the `SHAKTHIVASEE/Algo-quantum-transactions` repository.
+**SHAKTHIVASEE/Algo-quantum-transactions**
