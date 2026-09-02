@@ -32,9 +32,10 @@ python3 --version
 
 Install the current Algorand package using the official Algorand installation instructions.
 
-Install Algorand tools
+Install Algorand tools:
 
-```sudo apt update
+```bash
+sudo apt update
 sudo apt install -y gnupg2 curl software-properties-common
 
 curl -o - https://releases.algorand.com/key.pub | sudo tee /etc/apt/trusted.gpg.d/algorand.asc
@@ -43,9 +44,8 @@ sudo add-apt-repository "deb [arch=amd64] https://releases.algorand.com/deb/ sta
 
 sudo apt update
 
-sudo apt install -y algorand
+sudo apt install -y algorand-devtools
 ```
-
 
 Verify that the PQ commands are available:
 
@@ -58,9 +58,16 @@ You should have PQ commands such as `import`, `info`, and `sign`.
 
 ## 5. Create the project
 
+Create the project folder and enter it:
+
 ```bash
 mkdir -p ~/algo-transfer
 cd ~/algo-transfer
+```
+
+Create and activate the Python virtual environment:
+
+```bash
 python3 -m venv venv
 source venv/bin/activate
 ```
@@ -108,11 +115,49 @@ Confirm that the displayed Falcon-1024 PQ address matches your Pera Quantum acco
 
 > **Security:** Do not commit `pera_quantum.key` or your recovery phrase to this repository. Keep the recovery phrase offline and secure.
 
-## 7. Restore your scripts
+## 7. Create or restore your scripts
 
-Copy your Python scripts from the old PC into `~/algo-transfer`.
+There are two ways to get the Python scripts onto the new PC.
 
-Example:
+### Option A — Create a new script
+
+Go to your project directory:
+
+```bash
+cd ~/algo-transfer
+```
+
+Create the transaction script with `nano`:
+
+```bash
+nano transfer_100_pq.py
+```
+
+Paste your transaction script into the editor.
+
+Save it:
+
+- Press `Ctrl + O`
+- Press `Enter`
+- Press `Ctrl + X`
+
+Check that the file exists:
+
+```bash
+ls -l transfer_100_pq.py
+```
+
+You can also create the helper script:
+
+```bash
+nano make_tx.py
+```
+
+Paste the contents of your original `make_tx.py`, then save with `Ctrl + O`, `Enter`, and exit with `Ctrl + X`.
+
+### Option B — Copy the scripts from your old PC
+
+Copy these files into `~/algo-transfer`:
 
 ```text
 algo-transfer/
@@ -121,7 +166,26 @@ algo-transfer/
 └── transactions_100.txt
 ```
 
-Do not copy the `venv` directory; recreate it using the commands above.
+Do **not** copy the `venv` directory; recreate it using the commands in Section 5.
+
+### Check the scripts
+
+```bash
+cd ~/algo-transfer
+ls -la
+```
+
+You should see your Python files.
+
+Check the main script for syntax errors:
+
+```bash
+python -m py_compile transfer_100_pq.py
+```
+
+No output means the syntax check passed.
+
+> **Important:** Do not paste or store your 25-word recovery phrase, private key, or `pera_quantum.key` inside any Python script.
 
 ## 8. Check the transaction configuration
 
