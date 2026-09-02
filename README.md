@@ -115,77 +115,119 @@ Confirm that the displayed Falcon-1024 PQ address matches your Pera Quantum acco
 
 > **Security:** Do not commit `pera_quantum.key` or your recovery phrase to this repository. Keep the recovery phrase offline and secure.
 
-## 7. Create or restore your scripts
+## 7. Create new transaction scripts
 
-There are two ways to get the Python scripts onto the new PC.
+On a new PC, you can create the Python scripts manually instead of restoring an old `venv` or expecting the scripts to appear automatically.
 
-### Option A — Create a new script
-
-Go to your project directory:
+### 7.1 Go to the project folder
 
 ```bash
 cd ~/algo-transfer
 ```
 
-Create the transaction script with `nano`:
+### 7.2 Create the main transaction script
+
+Create a new file named `transfer_100_pq.py`:
 
 ```bash
 nano transfer_100_pq.py
 ```
 
-Paste your transaction script into the editor.
+The file will initially be empty. This is normal.
 
-Save it:
+Now **paste your previously working 100/500 transaction Python code** into the file.
 
-- Press `Ctrl + O`
-- Press `Enter`
-- Press `Ctrl + X`
+For example, the file should contain your working code that:
 
-Check that the file exists:
+- Connects to Algorand MainNet.
+- Uses your Falcon-1024 / Pera Quantum signing setup.
+- Sets the sender and recipient.
+- Sets the transaction amount and fee.
+- Builds and signs the transactions.
+- Sends the transactions.
+- Records successful transaction IDs in `transactions_100.txt`.
+
+> **Important:** The README does not store your private key, recovery phrase, or secret signing material. Copy only the Python source code that you previously tested and verified.
+
+Save the file in `nano`:
+
+1. Press `Ctrl + O`
+2. Press `Enter`
+3. Press `Ctrl + X`
+
+Check that it was created:
 
 ```bash
 ls -l transfer_100_pq.py
 ```
 
-You can also create the helper script:
+Check its contents:
+
+```bash
+nano transfer_100_pq.py
+```
+
+### 7.3 Create the helper script, if your setup uses it
+
+If your previous setup used `make_tx.py`, create it the same way:
 
 ```bash
 nano make_tx.py
 ```
 
-Paste the contents of your original `make_tx.py`, then save with `Ctrl + O`, `Enter`, and exit with `Ctrl + X`.
+Paste your previously working `make_tx.py` code, then save:
 
-### Option B — Copy the scripts from your old PC
+1. `Ctrl + O`
+2. `Enter`
+3. `Ctrl + X`
 
-Copy these files into `~/algo-transfer`:
+Check both files:
+
+```bash
+ls -la ~/algo-transfer
+```
+
+You should have something similar to:
 
 ```text
 algo-transfer/
 ├── make_tx.py
 ├── transfer_100_pq.py
-└── transactions_100.txt
+└── venv/
 ```
 
-Do **not** copy the `venv` directory; recreate it using the commands in Section 5.
+The transaction log `transactions_100.txt` will normally be created by the transaction script after a successful run. You do not need to create an empty log file manually unless your script specifically requires one.
 
-### Check the scripts
+### 7.4 Test the new script before running it
+
+Make sure the virtual environment is active:
 
 ```bash
 cd ~/algo-transfer
-ls -la
+source venv/bin/activate
 ```
 
-You should see your Python files.
-
-Check the main script for syntax errors:
+Run a Python syntax check:
 
 ```bash
 python -m py_compile transfer_100_pq.py
 ```
 
-No output means the syntax check passed.
+If there is **no output**, the Python syntax check passed.
 
-> **Important:** Do not paste or store your 25-word recovery phrase, private key, or `pera_quantum.key` inside any Python script.
+If there is an error, open the file and correct it:
+
+```bash
+nano transfer_100_pq.py
+```
+
+Then run the syntax check again.
+
+### 7.5 Copy the script from your old PC instead
+
+If you already have the working script on your old PC, you can copy `transfer_100_pq.py` and `make_tx.py` into `~/algo-transfer` instead of manually retyping them.
+
+Do **not** copy the old `venv` directory. Recreate the virtual environment using Section 5.
 
 ## 8. Check the transaction configuration
 
