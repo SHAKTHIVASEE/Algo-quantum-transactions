@@ -32,6 +32,21 @@ python3 --version
 
 Install the current Algorand package using the official Algorand installation instructions.
 
+Install Algorand tools
+
+```sudo apt update
+sudo apt install -y gnupg2 curl software-properties-common
+
+curl -o - https://releases.algorand.com/key.pub | sudo tee /etc/apt/trusted.gpg.d/algorand.asc
+
+sudo add-apt-repository "deb [arch=amd64] https://releases.algorand.com/deb/ stable main"
+
+sudo apt update
+
+sudo apt install -y algorand
+```
+
+
 Verify that the PQ commands are available:
 
 ```bash
