@@ -255,7 +255,7 @@ If your setup also uses `make_tx.py`:
 nano make_tx.py
 ```
 
-In below script change the **sender & Receiver address with your public address** Paste your working helper script and save it.
+In below script change the **sender & Receiver address with your public address** - Paste your working helper script and save it.
 
 ```import base64
 
