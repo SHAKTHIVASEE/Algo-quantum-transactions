@@ -102,7 +102,7 @@ cd ~/algo-transfer
 nano transfer_100_pq.py
 ```
 
-In below script change the sender address with your public address & Paste shown **working transaction automation script** into the file.
+In below script change the **sender address with your public address** & Paste shown **working transaction automation script** into the file.
 
 ```import json
 import os
@@ -255,7 +255,48 @@ If your setup also uses `make_tx.py`:
 nano make_tx.py
 ```
 
-Paste your working helper script and save it.
+In below script change the **sender & Receiver address with your public address** Paste your working helper script and save it.
+
+```import base64
+
+from algosdk.v2client import algod
+from algosdk.transaction import PaymentTxn, SignedTransaction
+from algosdk import encoding
+
+SENDER = "YYL3SCRJ7N3ZA6HXIR7JDFB6LYOUEUCFRKSQCGA5RZS4CJIOLU62LXFDDA"
+RECIPIENT = "YYL3SCRJ7N3ZA6HXIR7JDFB6LYOUEUCFRKSQCGA5RZS4CJIOLU62LXFDDA"
+
+client = algod.AlgodClient(
+    "",
+    "https://mainnet-api.algonode.cloud"
+)
+
+params = client.suggested_params()
+
+# Falcon-1024 transaction minimum fee
+params.fee = 3000
+params.flat_fee = True
+
+txn = PaymentTxn(
+    sender=SENDER,
+    sp=params,
+    receiver=RECIPIENT,
+    amt=1_000_000
+)
+
+# Put the unsigned payment inside a SignedTxn container.
+stxn = SignedTransaction(txn, None)
+
+# algokey expects raw MessagePack bytes.
+encoded = encoding.msgpack_encode(stxn)
+raw_msgpack = base64.b64decode(encoded)
+```
+
+Save in nano:
+
+1. `Ctrl + O`
+2. `Enter`
+3. `Ctrl + X`
 
 Check the files:
 
