@@ -248,7 +248,7 @@ print()
 print("=== COMPLETE ===")
 print(f"Successful: {successful}")
 print("Transaction log: transactions_500.txt")
-PY
+
 ```
 
 Save in nano:
